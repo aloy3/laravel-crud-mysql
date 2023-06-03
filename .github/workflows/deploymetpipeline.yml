@@ -22,8 +22,7 @@ jobs:
         run: |
           rsync -e "ssh -o StrictHostKeyChecking=no" -r --delete-after --quiet ${{ github.workspace }}/ ec2-user@3.91.62.176:/var/www/html/laravel-crud-mysql/
           ssh -o StrictHostKeyChecking=no ec2-user@3.91.62.176  sudo systemctl restart httpd
-          exit 1
-          
+        
   slack-notification:
     runs-on: ubuntu-latest
     needs: [deploy]
