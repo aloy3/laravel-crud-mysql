@@ -1,0 +1,55 @@
+name: Rsync Laravel to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install rsync
+        run: sudo apt-get install rsync -y
+        
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: 54.224.167.120
+
+      - name: Rsync to EC2
+        run: |
+          rsync -e "ssh -o StrictHostKeyChecking=no" -r --delete-after --quiet ${{ github.workspace }}/ ec2-user@54.224.167.120:/var/www/html/laravel-crud-mysql/
+          
+          
+          
+  slack_notification: 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Post to a Slack channel
+        id: slack
+        uses: slackapi/slack-github-action@v1.24.0
+        if: always()
+        with:
+          channel-id: 'CHANNEL_ID'
+          payload: |
+            {
+              "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
