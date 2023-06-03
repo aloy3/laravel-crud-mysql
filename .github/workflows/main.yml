@@ -20,6 +20,7 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SSH_KEY }}
+          known_hosts: 54.224.167.120
 
       - name: Rsync to EC2
         run: |
