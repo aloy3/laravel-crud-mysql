@@ -1,4 +1,4 @@
-name: Rsync Laravel to EC2
+name: Rsync Laravel to EC2 and Notification
 
 on:
   push:
